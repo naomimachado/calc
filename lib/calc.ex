@@ -21,13 +21,13 @@ defmodule Calc do
   @add_sub_expression_regex ~r/(\d+)(\+)(\-)(\d+)/
   @sign_regex ~r/(\+)(\-)(\d+)/
   @sign_regex2 ~r/(\-)(\+)(\d+)/
+  @sign_regex3 ~r/(\+)(\d+)/
 
   #main function
   def main() do
     exp = IO.gets(">")
     exp1 = "(#{exp})"
-    exp2 = String.replace(exp1," ","")
-    answer = eval(exp2)
+    answer = eval(exp1)
     IO.puts("#{answer}")
     main()
   end
@@ -35,6 +35,7 @@ defmodule Calc do
   #evaluate expression
   def eval(eq) do
     eq
+    |>String.replace(" ","")
     |>neg_num_subtraction
     |>neg_num_pos_num_expression
     |>mul_div_neg_num
@@ -45,6 +46,7 @@ defmodule Calc do
     |>add_sub_expression
     |>final_sign
     |>final_sign2
+    |>final_sign3
   end
 
   #handling cases like -5-9
@@ -185,6 +187,18 @@ defmodule Calc do
       if Regex.match?(@sign_regex2, chunk) do
         str8 = Regex.replace(@sign_regex2, chunk, fn _, _, _, r ->
           "-#{compute({to_int("0"), "+" , to_int(r)})}"
+        end)
+        eval(str8)
+      else
+          chunk
+      end
+  end
+
+  #handling cases like +6
+    def final_sign3(chunk) do
+      if Regex.match?(@sign_regex3, chunk) do
+        str8 = Regex.replace(@sign_regex3, chunk, fn _, _, r ->
+          "#{compute({to_int("0"), "+" , to_int(r)})}"
         end)
         eval(str8)
       else
